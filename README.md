@@ -112,4 +112,32 @@ cd etc/ansible
 ```
 - These are the steps needed to install and update ansible
 
+- Now that we have ansible we want to test that we have connection between our Vms. we are going to test if we can ssh into our db and web VM and also if we can ping them
+- To test if we ssh into our web/ db Vms from our Controller we need to run the command:
+```
+ssh vagrant@<ip> # the ip adressess are prset in the vagrantfile
+```
+- Now in order to ping the other VMs we use:
 
+```
+sudo ansible -m ping <???> # ??? = all/web db . whereever you want to ping
+
+#or
+
+sudo ansible -m ping --ask-vault-pass
+```
+
+- You will most likely recsize an error:
+```
+192.168.33.10 | FAILED! => {
+ "msg": "Using a SSH password instead of a key is not possible because Host Key checking is enabled and sshpass does not support this. Please add this host's fingerprint to your known_hosts file to manage this host."
+}
+```
+- We need to no change the host files `sudo nano hosts # should be in ansible folder` in this file we want to add our web and db username and password
+
+![img.png](img.png)
+
+- we also need to edit out `ansible.cfg` file and add this code under the defaults section:
+```
+host_key_checking = false
+```
