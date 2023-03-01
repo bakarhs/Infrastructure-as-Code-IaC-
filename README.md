@@ -133,7 +133,7 @@ sudo ansible -m ping --ask-vault-pass
  "msg": "Using a SSH password instead of a key is not possible because Host Key checking is enabled and sshpass does not support this. Please add this host's fingerprint to your known_hosts file to manage this host."
 }
 ```
-- We need to no change the host files `sudo nano hosts # should be in ansible folder` in this file we want to add our web and db username and password
+- We need to no modify the host files `sudo nano hosts # should be in ansible folder` in this file we want to add our web and db username and password
 
 ![img.png](img.png)
 
@@ -141,3 +141,198 @@ sudo ansible -m ping --ask-vault-pass
 ```
 host_key_checking = false
 ```
+
+- There is also an additional step we can take - we first need to ssh into web through our controller
+- w...
+
+## ad hoc commands
+
+![img_1.png](img_1.png)
+
+https://docs.ansible.com/ansible/latest/command_guide/intro_adhoc.html#managing-files
+
+In Ansible, ad hoc commands are used to execute a quick command or a set of commands on a remote host without the need for a playbook or inventory file. Ad hoc commands are typically used for tasks that require immediate attention, such as running a one-off command or checking the status of a service.
+
+Here's an example of an ad hoc command that checks the uptime of a remote host:
+
+```bash
+ansible <target-host> -m command -a "uptime"
+```
+
+In this command, <target-host> is the name or IP address of the remote host. -m specifies the module to use, which in this case is the command module. -a specifies the arguments to pass to the module, which in this case is the uptime command.
+
+# Creating a playbook using YAML
+
+Playbooks are YAML files containing a list of ordered tasks that should be executed on a remote server to complete a task or reach a certain goal
+
+YAML = Yet Another Markup Language
+
+Yaml can be used with Ansible - Docker - Kubernetes - Cloud formation etc.
+
+## Creating a YAML playbook for nginx
+
+First = Make sure you are in the correct directory `cd /etc/ansible`
+
+Use `sudo nano <playbook name>.yml` to create and edit your playbooks
+
+To run a playbook use the command `sudo ansible-playbook <playbook file>`
+
+```yaml
+# create a playbook to configure nginx webserver in web machine
+
+# lets's add --- 3 dashes to start a YAML file
+---
+
+# where do we want this playbook to run
+# add the name of the host
+- hosts: web
+
+# find the facts
+  gather_facts: yes
+
+# we need admin access
+  become: true
+
+# add instructions to perform the task
+# install nginx in web machine
+  tasks:
+  - name: Install Nginx in web-server
+    apt: pkg=nginx state=present
+# ensure nginx is running - status is running
+
+```
+
+This is the playbook needed to provision our web Vm using YAML with Ansible
+
+## Creating a YAML playbook to install my app
+
+When creating my playbook for my app dependencies I struggled a lot with versioning as the version I was previously using was 12. For somme reason I could not find a yamal script that would allow me to have the correct version ,so it came dwn to me having to install my dependencies using script 
+
+```yaml
+# create a playbook to configure app install in web machine
+
+# lets's add --- 3 dashes to start a YAML file
+---
+
+# where do we want this playbook to run
+# add the name of the host
+- hosts: web
+
+# find the facts
+  gather_facts: yes
+
+# we need admin access
+  become: true
+
+# add instructions to perform the task
+# install nginx in web machine
+  tasks:
+
+  - name : Cloning GIT
+    git:
+      repo: https://github.com/bakarhs/tech210_virtualisation.git
+      dest: /home/vagrant/repo
+      clone: yes
+      update: yes
+
+  - name: set up app
+    shell: |
+      cd repo/tech201_virtualisation
+      curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+      sudo apt-get install nodejs -y
+      sudo npm install pm2 -g
+      cd app
+      npm install
+      pm2 kill
+      node app.js
+      nohup npm start 2>/dev/null 1>/dev/null&
+# ensure nginx is running - status is running
+
+```
+
+# Creating a yaml playbook to provision db
+
+- First you want to make sure you can ping this VM to make sure its listening ,and you have access - should be in the host file (look above on how to do this)
+- Now we want to update our webb playbook to add any links to the db - Note we can add nginx to the top of this playbook so that we can minimise the amount of play books we have
+
+```yaml
+# create a playbook to configure app install in web machine
+
+# lets's add --- 3 dashes to start a YAML file
+---
+
+# where do we want this playbook to run
+# add the name of the host
+- hosts: web
+
+# find the facts
+  gather_facts: yes
+
+# we need admin access
+  become: true
+
+# add instructions to perform the task
+# install dependencies in web machine
+  tasks:
+
+  - name : Cloning GIT
+    git:
+      repo: https://github.com/bakarhs/tech210_virtualisation.git
+      dest: /home/vagrant/repo
+      clone: yes
+      update: yes
+
+  - name: set up app
+    shell: |
+      cd repo/tech201_virtualisation
+      curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+      sudo apt-get install nodejs -y
+      sudo npm install pm2 -g
+      cd app
+      npm install
+      node seeds/seed.js
+      export DB_HOST=mongodb://192.168.33.11:27017/posts >> ~/.bashrc
+      source .bashrc
+      pm2 kill
+      node app.js
+      nohup npm start 2>/dev/null 1>/dev/null&
+# ensure web is running - status is running
+
+
+```
+- Now we want to create a playbook for our Db and add in our yamal commands
+```yaml
+# create a playbook to configure/ install mongodb in our db machine
+# name of the host/node
+
+---
+
+- hosts: db
+
+  gather_facts: yes
+
+  become: true
+
+  tasks:
+  - name: install mongodb
+    apt: pkg=mongodb state=present
+
+  - name: Cloning GIT
+    git:
+      repo: https://github.com/bakarhs/tech210_virtualisation.git
+      dest: /repo
+      clone: yes
+      update: yes
+
+  - name: Deleting mongod configurations and adding in the correct configurations
+    shell:  |
+      cd  /etc
+      rm mongodb.conf
+      cp /repo/tech201_virtualisation/environment/database/mongod.conf /etc/mongodb.conf
+      systemctl restart mongodb
+      systemctl enable mongodb
+
+```
+
+- Make sure to run both playbooks before you check the web browser to see if your database is seeded and receiving posts
+
