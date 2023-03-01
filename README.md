@@ -95,6 +95,10 @@ sudo apt-get update -y
 sudo spt-get upgrade -y
 ```
 
+## **NOTE**
+- Always make sure to update and upgrade shell every time you launch your vm 
+- A big tip is to save the state of your VM instead of starting again the next time.
+
 - Next we need to get ansible on our controller VM:
 
 ```
