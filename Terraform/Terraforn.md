@@ -20,6 +20,10 @@ https://developer.hashicorp.com/terraform/downloads?product_intent=terraform
 
 ![img_2.png](img_2.png)
 
+- Now we want to run GitBash as an administrator and check to see if we have terraform with `terraform --version`
+
+![img_3.png](img_3.png)
+
 
 
 
