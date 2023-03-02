@@ -24,6 +24,10 @@ https://developer.hashicorp.com/terraform/downloads?product_intent=terraform
 
 ![img_3.png](img_3.png)
 
+https://www.youtube.com/watch?v=SkcRSJWNRS8
+
+- This video can help with the installing terraform step
+
 
 
 
