@@ -28,6 +28,8 @@ Orchestration involves coordinating and managing multiple infrastructure resourc
 
 In IaC, configuration management and orchestration work together to automate the deployment, scaling, and management of infrastructure. Configuration management tools ensure that each resource is configured correctly, while orchestration tools manage the relationships between resources and enable complex deployments to be automated and managed easily. By using these tools, IaC can help to reduce the time and effort required to manage infrastructure, while also improving reliability and consistency.
 
+Ansible can be used for configuration management of servers and applications, while Terraform can be used for provisioning and managing the underlying infrastructure. This allows for a complete end-to-end automation of infrastructure deployment and management, from application configuration to underlying infrastructure provisioning.
+
 # Using Ansible with VMs
 
 - Create a project locally called `Iacansible` Ansible and add a vagrantfile to the directory.
