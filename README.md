@@ -30,6 +30,8 @@ In IaC, configuration management and orchestration work together to automate the
 
 Ansible can be used for configuration management of servers and applications, while Terraform can be used for provisioning and managing the underlying infrastructure. This allows for a complete end-to-end automation of infrastructure deployment and management, from application configuration to underlying infrastructure provisioning.
 
+![img_2.png](img_2.png)
+
 # Using Ansible with VMs
 
 - Create a project locally called `Iacansible` Ansible and add a vagrantfile to the directory.
