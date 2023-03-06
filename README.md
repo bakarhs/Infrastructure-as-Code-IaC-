@@ -20,6 +20,14 @@ We use IaC whenever we need to create, update, or manage infrastructure resource
 
 To use IaC, we typically write code using a programming language or a specialized tool such as Terraform, Ansible, or CloudFormation. The code defines the desired state of infrastructure resources, and we use tools to apply the code to the target environment, creating, updating, or deleting resources as necessary. The IaC code can also be version-controlled, tested, and audited, just like application code, to ensure the desired state of the infrastructure is maintained over time.
 
+## Configuration management and Orchestration
+
+Configuration management involves defining the desired state of infrastructure using code, and then automatically configuring the infrastructure to match that state. Configuration management tools like Ansible, Puppet, and Chef can be used to manage server configurations, packages, users, and other system settings.
+
+Orchestration involves coordinating and managing multiple infrastructure resources to achieve a specific goal. Orchestration tools like Kubernetes, Docker Swarm, and Apache Mesos can be used to manage containerized applications, including scaling, load balancing, and rolling updates.
+
+In IaC, configuration management and orchestration work together to automate the deployment, scaling, and management of infrastructure. Configuration management tools ensure that each resource is configured correctly, while orchestration tools manage the relationships between resources and enable complex deployments to be automated and managed easily. By using these tools, IaC can help to reduce the time and effort required to manage infrastructure, while also improving reliability and consistency.
+
 # Using Ansible with VMs
 
 - Create a project locally called `Iacansible` Ansible and add a vagrantfile to the directory.
