@@ -83,7 +83,138 @@ variable.tf
 
 ![img_7.png](Images/img_7.png)
 
+## Terraform commands
 
+`terraform init`: Prepare your working directory for other commands
+
+`terraform validate`: Check whether the configuration is valid
+
+`terraform plan`: Show changes required by the current configuration
+
+`terraform apply`: Create or update infrastructure
+
+`terraform destroy`: Destroy previously-created infrastructure
+
+```
+# launch ec2
+# which cloud proviider - aws
+
+provider "aws" {
+    region = "eu-west-1"
+
+}
+
+resource "aws_vpc" "abubakar-vpc-terraform" {
+  cidr_block       = "10.0.0.0/16"
+  instance_tenancy = "default"
+
+  tags = {
+    Name = "abubakar-tech201-vpc"
+  }
+}
+
+resource "aws_internet_gateway" "gw" {
+  vpc_id = var.vpc_id
+
+  tags = {
+    Name = "abubakar-tech201-IG"
+  }
+}
+
+resource "aws_subnet" "abubakar-tech201-pub" {
+  vpc_id     = var.vpc_id
+  cidr_block = var.pub_sn_ip
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "abubakar-tech201-pub-sn-app"
+  }
+}
+
+resource "aws_subnet" "abubakar-tech201-priv-subnet" {
+  vpc_id     = var.vpc_id
+  cidr_block = var.priv_sn_ip
+
+  tags = {
+    Name = "abubakar-tech201-priv-sn-app"
+  }
+}
+
+resource "aws_route_table" "abubakar-tech201-public-rt" {
+    vpc_id = var.vpc_id
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = var.IG_id
+        }
+        tags = {
+            Name = "abubakar-tech201-public-rt"
+            }
+        }
+resource "aws_route_table_association" "abubakar-tech201-public-rt-association" {
+    subnet_id = var.public_sn_id
+    route_table_id = var.rt_id
+    }
+# add rout to internet gateway 
+resource "aws_security_group" "abubakar-tech201-app-sg-terraform" {
+  name        = "allow ports 22,80,3000"
+  description = "abubakar-tech201-app-sg-terraformc"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description      = "Not secure"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "abubakar-tech201-app-sg-terraform"
+  }
+  }
+
+
+resource "aws_instance" "app_instance" {
+    ami = var.webapp_ami-id
+    instance_type = "t2.micro"
+    key_name = var.MyKeyPair
+
+    subnet_id = var.public_sn_id
+    vpc_security_group_ids = [var.app-sg]
+    associate_public_ip_address = true
+    tags = { 
+        Name = "abubakar-tech201-terraform-app"
+
+    }
+  
+}
+
+
+```
 
 
 
